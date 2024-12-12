@@ -1,5 +1,7 @@
-#bin/bash
-module load gcc
-module load openmpi
-mpic++ -O3 main.cpp -o main
-sbatch serial.sh
+#bash/bin
+sbatch sb1.sh
+sbatch sb2.sh
+sbatch sb4.sh
+sbatch sb8.sh
+sbatch sb16.sh
+sbatch sb32.sh
