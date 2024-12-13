@@ -92,9 +92,9 @@ vector<vector<int>> expandNode(const vector<int> &board) {
 
 void ensureEnoughTasks(queue<vector<int>> &tasks, int p) {
     int cnt = 0;
-    while ((int)tasks.size() < p) {
+    while (True) {
         cnt++;
-        if (tasks.empty() or cnt > 4) return;
+        if (tasks.empty() or cnt > 5) return;
         vector<int> front = tasks.front();
         tasks.pop();
         auto newNodes = expandNode(front);
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
             } else if (tag == TAG_SOLUTION_FAIL) {
                 int dummy;
                 MPI_Recv(&dummy, 1, MPI_INT, source, TAG_SOLUTION_FAIL, MPI_COMM_WORLD, &status);
-                ensureEnoughTasks(tasks, p);
+                // ensureEnoughTasks(tasks, p);
                 if (tasks.empty()) {
                     MPI_Send(NULL, 0, MPI_INT, source, TAG_NO_MORE_TASK, MPI_COMM_WORLD);
                     activeWorkers--;
