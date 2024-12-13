@@ -133,6 +133,7 @@ int main(int argc, char* argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     bool hasprinted = false;
+    double end = 0;
 
     int p = size - 1;
     static int M_global[N][N];
@@ -180,6 +181,7 @@ int main(int argc, char* argv[]) {
             int tag = status.MPI_TAG;
 
             if (tag == TAG_SOLUTION_FOUND) {
+                end = MPI_Wtime();
                 MPI_Recv(&solutionBoard[0], 81, MPI_INT, source, TAG_SOLUTION_FOUND, MPI_COMM_WORLD, &status);
                 solutionFound = true;
                 // 通知其他worker终止
@@ -223,7 +225,6 @@ int main(int argc, char* argv[]) {
         if (solutionFound && !hasprinted) {
             hasprinted = true;
             int SolM[9][9];
-            double end = MPI_Wtime();
             boardToIntArray(solutionBoard, SolM);
             for (int i = 0; i < 9; i++) 
                 for (int j = 0; j < 9; j++) 
