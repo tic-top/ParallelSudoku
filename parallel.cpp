@@ -91,8 +91,10 @@ vector<vector<int>> expandNode(const vector<int> &board) {
 }
 
 void ensureEnoughTasks(queue<vector<int>> &tasks, int p) {
+    int cnt = 0;
     while ((int)tasks.size() < p) {
-        if (tasks.empty()) return;
+        cnt++;
+        if (tasks.empty() or cnt > 4) return;
         vector<int> front = tasks.front();
         tasks.pop();
         auto newNodes = expandNode(front);
