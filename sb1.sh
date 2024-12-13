@@ -27,50 +27,57 @@ echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$outp
 mkfifo serial_in
 mkfifo serial_out
 
-# 使用stdbuf强制行缓冲，以便read能及时读到输出
+# 启动serial程序（使用stdbuf确保行缓冲）
 stdbuf -oL ./serial < serial_in > serial_out &
 serial_pid=$!
 
-st=$(date +%s)
+start_total=$(date +%s)
 line_count=0
 
-# 从 CSV 文件中读取数据并处理
+# 从CSV中读取数据(跳过表头)
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
     echo "Processing line $line_count..."
     line_count=$((line_count + 1))
-    puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
-    solution=$(echo "$solution" | sed 's/\r//g' | tr -d '\n')
-    clues=$(echo "$clues" | sed 's/\r//g' | tr -d '\n')
-    difficulty=$(echo "$difficulty" | sed 's/\r//g' | tr -d '\n')
-    difficulty_range=$(echo "$difficulty_range" | sed 's/\r//g' | tr -d '\n')
+
+    # 清洗数据中的可能的回车换行符
+    puzzle=$(echo "$puzzle" | tr -d '\r\n')
+    solution=$(echo "$solution" | tr -d '\r\n')
+    clues=$(echo "$clues" | tr -d '\r\n')
+    difficulty=$(echo "$difficulty" | tr -d '\r\n')
+    difficulty_range=$(echo "$difficulty_range" | tr -d '\r\n')
 
     start_time=$(date +%s%3N)
-    # 将数独传给serial程序
+    # 将数独题目发送给serial进程
     echo "$puzzle" > serial_in
 
-    # 从serial程序的输出中读取结果, read将会一直等待一行数据的到来
-    read -r result_and_time < serial_out
+    # 从serial_out读取结果，read命令会阻塞直到读到一行输出
+    if ! read -r result_and_time < serial_out; then
+        echo "Error: Failed to read from serial_out"
+        break
+    fi
 
     end_time=$(date +%s%3N)
     elapsed_time=$((end_time - start_time))
 
-    # 假设输出格式为：result runtime
+    # 假设输出格式为"result runtime"
     result=$(echo "$result_and_time" | awk '{print $1}')
     runtime=$(echo "$result_and_time" | awk '{print $2}')
-    echo "Runtime: $runtime, Esttime: ${elapsed_time}ms"
 
-    # 将结果写入CSV文件
+    echo "Runtime (from solver): $runtime ms, Local measured: ${elapsed_time}ms"
+
+    # 写入结果到CSV
     echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
+
 done
 
-# 所有题目处理完后，通知serial程序退出
+# 所有题目处理完后，通知serial退出
 echo "exit" > serial_in
 
-# 等待serial程序退出
+# 等待serial程序结束
 wait $serial_pid
 
 # 清理命名管道
 rm serial_in serial_out
 
-end_time=$(date +%s)
-echo "Total time: $((end_time - st))s"
+end_total=$(date +%s)
+echo "Total time: $((end_total - start_total))s"
