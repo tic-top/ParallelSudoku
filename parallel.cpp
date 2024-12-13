@@ -156,9 +156,8 @@ int main(int argc, char* argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     double end = 0;
     double start = 0;
-
-    int p = size - 1;
-    // ensure p>0
+    int p = size - 1; // Number of worker processes
+    // ensure p > 0
     if (p <= 0) {
         cout << "At least 1 worker is required." << endl;
         MPI_Finalize();
@@ -167,19 +166,30 @@ int main(int argc, char* argv[]) {
 
     if (rank == 0) {
         // Master
-        string puzzle;
-        cin >> puzzle;
-
-        vector<int> initBoard(81);
-        for (int i = 0; i < 81; i++) {
-            initBoard[i] = puzzle[i] - '0';
-        }
-        start = MPI_Wtime();
         queue<vector<int>> tasks;
-        tasks.push(initBoard);
 
-        distributeTasks(tasks, p, &end); // 动态任务分配
-        cout << (end - start) * 1000 << endl;
+        // 主进程循环，等待新的数独输入
+        while (true) {
+            string puzzle;
+            cin >> puzzle;
+
+            if (puzzle == "exit") {
+                // 收到退出信号，通知所有工作进程终止
+                for (int w = 1; w <= p; w++) {
+                    MPI_Send(NULL, 0, MPI_INT, w, TAG_TERMINATE, MPI_COMM_WORLD);
+                }
+                break;
+            }
+
+            // 解析数独并将其作为任务放入队列
+            vector<int> initBoard(81);
+            for (int i = 0; i < 81; i++) {
+                initBoard[i] = puzzle[i] - '0';
+            }
+
+            tasks.push(initBoard);
+            distributeTasks(tasks, p, &end); // 动态任务分配
+        }
     } else {
         // Worker
         bool running = true;
@@ -203,7 +213,7 @@ int main(int argc, char* argv[]) {
                         sol[i] = M_task[i];
                     }
                     MPI_Send(&sol[0], 81, MPI_INT, 0, TAG_SOLUTION_FOUND, MPI_COMM_WORLD);
-                    running = false;
+                    running = false; // 完成解题，退出
                 } else {
                     int dummy = 0;
                     MPI_Send(&dummy, 1, MPI_INT, 0, TAG_SOLUTION_FAIL, MPI_COMM_WORLD);
@@ -211,20 +221,16 @@ int main(int argc, char* argv[]) {
 
             } else if (tag == TAG_NO_MORE_TASK) {
                 MPI_Recv(NULL, 0, MPI_INT, 0, TAG_NO_MORE_TASK, MPI_COMM_WORLD, &status);
-                running = false;
+                running = false; // 没有更多任务，退出
+
             } else if (tag == TAG_TERMINATE) {
                 MPI_Recv(NULL, 0, MPI_INT, 0, TAG_TERMINATE, MPI_COMM_WORLD, &status);
-                running = false;
+                running = false; // 终止信号，退出
             }
         }
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
-    if (rank == 0) {
-        end = MPI_Wtime();
-        cout << "Final: ";
-        cout << (end - start) * 1000 << "ms"<< endl;
-    }
     return 0;
 }

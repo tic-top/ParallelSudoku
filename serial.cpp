@@ -49,40 +49,48 @@ bool solveSudoku(int grid[N][N]) {
 }
 
 int main() {
-    // 读取81位输入字符串
-    string puzzle;
-    cin >> puzzle;
-    // 将其转为9x9整型数组
-    int grid[N][N];
-    for (int i = 0; i < 81; i++) {
-        char c = puzzle[i];
-        if (c >= '0' && c <= '9') {
-            grid[i/9][i%9] = c - '0';
+    // 循环读取数独输入
+    while (true) {
+        string puzzle;
+        cout << "Enter Sudoku (81 characters, 0 for empty cells), or 'exit' to quit: ";
+        cin >> puzzle;
+
+        // 用户输入 'exit' 时退出程序
+        if (puzzle == "exit") {
+            break;
+        }
+
+        // 将输入的81位字符转换为9x9整型数组
+        int grid[N][N];
+        for (int i = 0; i < 81; i++) {
+            char c = puzzle[i];
+            if (c >= '0' && c <= '9') {
+                grid[i/9][i%9] = c - '0';
+            } else {
+                // 如果不是数字，作为0处理
+                grid[i/9][i%9] = 0;
+            }
+        }
+
+        auto start = std::chrono::steady_clock::now();
+        bool solved = solveSudoku(grid);
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+
+        if (!solved) {
+            // 无解情况，这里根据需要处理，此处简单输出原题和时间
+            // 实务中可以按需要改变行为
+            cout << puzzle << " " << elapsed_seconds.count() * 1000 << "ms" << "\n";
         } else {
-            // 如果不是数字，作为0处理
-            grid[i/9][i%9] = 0;
+            // 输出解答（81位数字）和耗时
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    cout << grid[i][j];
+                }
+            }
+            cout << " " << elapsed_seconds.count() * 1000 << "ms" << "\n";
         }
     }
-
-    auto start = std::chrono::steady_clock::now();
-    bool solved = solveSudoku(grid);
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end - start;
-
-    if (!solved) {
-        // 无解情况，这里根据需要处理，此处简单输出原题和时间
-        // 实务中可以按需要改变行为
-        cout << puzzle << " " << elapsed_seconds.count() * 1000 << "\n";
-        return 0;
-    }
-
-    // 输出解答（81位数字）和耗时
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            cout << grid[i][j];
-        }
-    }
-    cout << " " << elapsed_seconds.count() * 1000 << "\n";
 
     return 0;
 }
