@@ -94,7 +94,7 @@ void ensureEnoughTasks(queue<vector<int>> &tasks, int p) {
     int cnt = 0;
     while (True) {
         cnt++;
-        if (tasks.empty() or cnt > 5) return;
+        if (tasks.empty() or cnt > 3) return;
         vector<int> front = tasks.front();
         tasks.pop();
         auto newNodes = expandNode(front);
@@ -176,6 +176,7 @@ int main(int argc, char* argv[]) {
             if (tag == TAG_SOLUTION_FOUND) {
                 MPI_Recv(&solutionBoard[0], 81, MPI_INT, source, TAG_SOLUTION_FOUND, MPI_COMM_WORLD, &status);
                 solutionFound = true;
+                end = MPI_Wtime();
                 // 通知其他worker终止
                 for (int w = 1; w <= p; w++) {
                     if (w != source) {
@@ -203,7 +204,6 @@ int main(int argc, char* argv[]) {
         }
 
         if (solutionFound && !hasprinted) {
-            end = MPI_Wtime();
             hasprinted = true;
             for (int i = 0; i < 81; i++) {
                 cout << solutionBoard[i];
