@@ -129,7 +129,6 @@ void clearMessageQueue() {
 
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
-    double start = MPI_Wtime();
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -171,6 +170,7 @@ int main(int argc, char* argv[]) {
                 MPI_Send(&task[0], 81, MPI_INT, w, TAG_SEND_TASK, MPI_COMM_WORLD);
             }
         }
+        double start = MPI_Wtime();
 
         // 主循环等待反馈
         while (activeWorkers > 0 && !solutionFound) {
