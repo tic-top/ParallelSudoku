@@ -175,8 +175,6 @@ int main(int argc, char* argv[]) {
             int tag = status.MPI_TAG;
 
             if (tag == TAG_SOLUTION_FOUND) {
-                end = MPI_Wtime();
-                cout << "Time DFS: " << (end - start)*1000 << "ms" << endl;
                 MPI_Recv(&solutionBoard[0], 81, MPI_INT, source, TAG_SOLUTION_FOUND, MPI_COMM_WORLD, &status);
                 solutionFound = true;
                 // 通知其他worker终止
@@ -242,6 +240,8 @@ int main(int argc, char* argv[]) {
                 }
 
                 if (solveSudokuDFS(M_task)) {
+                    end = MPI_Wtime();
+                    cout << "Time DFS: " << (end - start)*1000 << "ms" << endl;
                     vector<int> sol(81);
                     for (int i = 0; i < 81; i++) {
                         sol[i] = M_task[i/9][i%9];
