@@ -25,6 +25,7 @@ output_csv="output$p.csv"
 echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$output_csv"
 
 line_count=0
+st=$(date +%s)
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
     # 当处理满1000条后就停止
     # if [ $line_count -ge 100 ]; then
@@ -51,4 +52,6 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     echo "Runtime: $runtime, Esttime: ${elapsed_time}ms"
     echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
 done
+end_time=$(date +%s)
+echo "Total time: $((end_time - st))s"
 

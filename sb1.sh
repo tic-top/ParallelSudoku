@@ -29,6 +29,7 @@ line_count=0
 
 # 统计总运行时间
 # 读取csv文件并处理
+st=$(date +%s)
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
     # echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range" >> "$output_csv"
     # 当处理满1000条后就停止
@@ -58,4 +59,4 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
 done
 end_time=$(date +%s)
-echo "Total time: $((end_time - start_time))s"
+echo "Total time: $((end_time - st))s"
