@@ -29,20 +29,20 @@ line_count=0
 
 # 读取csv文件并处理
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
-    echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range" >> "$output_csv"
+    # echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range" >> "$output_csv"
     # 当处理满1000条后就停止
     if [ $line_count -ge 100 ]; then
         break
     fi
     line_count=$((line_count + 1))
 
-    # # 将quizzes作为输入传给程序并使用并行数p
-    # result_and_time=$(echo "$puzzle" | ./serial)
+    # 将quizzes作为输入传给程序并使用并行数p
+    result_and_time=$(echo "$puzzle" | ./serial)
 
-    # # 假设输出格式是：result runtime
-    # result=$(echo "$result_and_time" | awk '{print $1}')
-    # runtime=$(echo "$result_and_time" | awk '{print $2}')
+    # 假设输出格式是：result runtime
+    result=$(echo "$result_and_time" | awk '{print $1}')
+    runtime=$(echo "$result_and_time" | awk '{print $2}')
 
-    # # 将结果写入CSV文件
-    # echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
+    # 将结果写入CSV文件
+    echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
 done
