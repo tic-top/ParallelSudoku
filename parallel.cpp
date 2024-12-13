@@ -179,6 +179,7 @@ int main(int argc, char* argv[]) {
         distributeTasks(tasks, p); // 动态任务分配
 
         end = MPI_Wtime();
+        cout << ' ' << end - start << endl;
     } else {
         // Worker
         bool running = true;
