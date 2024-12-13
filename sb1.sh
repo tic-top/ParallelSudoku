@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #SBATCH --job-name=sudoku
 #SBATCH --mail-type=BEGIN,END
 #SBATCH --nodes=1
