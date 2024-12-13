@@ -1,21 +1,28 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <sstream>
+#include <vector>
+#include <iomanip> // For setting precision
+#include <cstdlib> // For atoi
+#include <cmath> // For pow
+#include <algorithm> // For min, max
+
 using namespace std;
 
 static const int N = 9;
 
-// 检查在grid[row][col]处放val是否合法
+// Function to check if placing val at grid[row][col] is valid
 bool isValid(int grid[N][N], int row, int col, int val) {
-    // 行检查
+    // Row check
     for (int j = 0; j < N; j++) {
         if (grid[row][j] == val) return false;
     }
-    // 列检查
+    // Column check
     for (int i = 0; i < N; i++) {
         if (grid[i][col] == val) return false;
     }
-    // 3x3宫检查
+    // 3x3 subgrid check
     int startRow = (row / 3) * 3;
     int startCol = (col / 3) * 3;
     for (int i = 0; i < 3; i++) {
@@ -26,76 +33,164 @@ bool isValid(int grid[N][N], int row, int col, int val) {
     return true;
 }
 
-// 使用回溯法求解数独
+// Backtracking Sudoku solver
 bool solveSudoku(int grid[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            if (grid[i][j] == 0) {
-                // 尝试1-9
-                for (int val = 1; val <= 9; val++) {
+            if (grid[i][j] == 0) { // Find an empty cell
+                for (int val = 1; val <= 9; val++) { // Try values 1-9
                     if (isValid(grid, i, j, val)) {
-                        grid[i][j] = val;
-                        if (solveSudoku(grid)) {
+                        grid[i][j] = val; // Tentatively assign
+                        if (solveSudoku(grid)) { // Recurse
                             return true;
                         }
-                        grid[i][j] = 0; // 回溯
+                        grid[i][j] = 0; // Backtrack
                     }
                 }
-                return false; // 如果1-9都不行，回溯上一层
+                return false; // Trigger backtracking
             }
         }
     }
-    return true; // 全部填满则返回true
+    return true; // Solved
 }
 
 int main() {
-    // 循环读取数独输入
-    while (true) {
-        std::string puzzle;
-        if (!std::getline(std::cin, puzzle)) {
-            // 如果无法读取到行，说明输入结束或出错，break
+    // Expected CSV input: puzzle,solution,clues,difficulty,difficulty_range
+    // Output: puzzle,solution,clues,difficulty,difficulty_range,result,time
+    // 'result' is 'Solved' or 'No Solution', 'time' is in milliseconds
+
+    string line;
+    bool isFirstLine = true;
+
+    // Read input line by line
+    while (getline(cin, line)) {
+        // Trim whitespace from both ends
+        size_t start = line.find_first_not_of(" \t\r\n");
+        size_t end = line.find_last_not_of(" \t\r\n");
+        if (start == string::npos) {
+            // Line contains only whitespace
+            continue;
+        }
+        line = line.substr(start, end - start + 1);
+
+        // Handle 'exit' command
+        if (line == "exit") {
             break;
         }
 
-        // 去除多余空白
-        if (puzzle.empty()) {
-            continue; // 遇到空行则继续等待下一行
+        // Skip empty lines
+        if (line.empty()) {
+            continue;
         }
 
-        if (puzzle == "exit") {
-            break;
+        // Parse CSV fields
+        stringstream ss(line);
+        string field;
+        vector<string> fields;
+
+        while (getline(ss, field, ',')) {
+            fields.push_back(field);
         }
 
+        // If it's the first line (header), process accordingly
+        if (isFirstLine) {
+            isFirstLine = false;
+            // Optionally, you can validate the header here
+            // For simplicity, we'll include the new fields in the output header
+            cout << "puzzle,solution,clues,difficulty,difficulty_range,result,time\n";
+            continue;
+        }
 
-        // 将输入的81位字符转换为9x9整型数组
-        int grid[N][N];
+        // Ensure there are at least 5 fields as per the header
+        if (fields.size() < 5) {
+            cerr << "Invalid input format. Expected at least 5 fields, got " << fields.size() << ".\n";
+            continue;
+        }
+
+        string puzzle = fields[0];
+        string solution = fields[1];
+        string clues = fields[2];
+        string difficulty = fields[3];
+        string difficulty_range = fields[4];
+
+        // Validate puzzle length
+        if (puzzle.length() != 81) {
+            cerr << "Invalid puzzle length. Expected 81 characters, got " << puzzle.length() << ".\n";
+            // Output with 'No Solution' and zero time
+            cout << puzzle << "," << solution << "," << clues << "," 
+                 << difficulty << "," << difficulty_range 
+                 << ",Invalid Puzzle Length,0\n";
+            continue;
+        }
+
+        // Initialize the grid to zero
+        int grid[N][N] = {0};
+
+        // Populate the grid
+        bool invalidChar = false;
         for (int i = 0; i < 81; i++) {
             char c = puzzle[i];
-            if (c >= '0' && c <= '9') {
-                grid[i/9][i%9] = c - '0';
+            if (c >= '1' && c <= '9') {
+                grid[i / 9][i % 9] = c - '0';
+            } else if (c == '0' || c == '.') { // Allow '0' or '.' for empty cells
+                grid[i / 9][i % 9] = 0;
             } else {
-                // 如果不是数字，作为0处理
-                grid[i/9][i%9] = 0;
+                // Invalid character encountered
+                cerr << "Invalid character '" << c << "' in puzzle at position " << i+1 << ".\n";
+                grid[i / 9][i % 9] = 0; // Treat as empty
+                invalidChar = true;
             }
         }
 
-        auto start = std::chrono::steady_clock::now();
+        // Measure solving time
+        auto start_time = std::chrono::steady_clock::now();
         bool solved = solveSudoku(grid);
-        auto end = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end - start;
+        auto end_time = std::chrono::steady_clock::now();
+        chrono::duration<double> elapsed_seconds = end_time - start_time;
+        double elapsed_ms = elapsed_seconds.count() * 1000.0;
 
+        // Prepare result string
+        string result;
         if (!solved) {
-            // 无解情况，这里根据需要处理，此处简单输出原题和时间
-            // 实务中可以按需要改变行为
-            cout << puzzle << " " << (elapsed_seconds.count() * 1000) << std::endl;
+            result = "No Solution";
         } else {
-            // 输出解答（81位数字）和耗时
+            result = "Solved";
+        }
+
+        // Convert solved grid back to string if solved
+        string solvedPuzzle = puzzle; // Default to original puzzle
+        if (solved) {
+            solvedPuzzle = "";
+            solvedPuzzle.reserve(81);
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < N; j++) {
-                    cout << grid[i][j];
+                    solvedPuzzle += to_string(grid[i][j]);
                 }
             }
-            cout << " " << elapsed_seconds.count() * 1000 << std::endl;
+        }
+
+        // If there were invalid characters, mark as 'Invalid Puzzle'
+        if (invalidChar) {
+            result = "Invalid Puzzle";
+        }
+
+        // Output in CSV format
+        // Fields: puzzle,solution,clues,difficulty,difficulty_range,result,time
+        // Time is set to zero if puzzle is invalid
+        if (result == "Invalid Puzzle") {
+            cout << puzzle << "," << solution << "," << clues << "," 
+                 << difficulty << "," << difficulty_range 
+                 << "," << result << "," << "0\n";
+        } else {
+            cout << puzzle << ",";
+            if (solved) {
+                cout << solvedPuzzle;
+            } else {
+                cout << solution; // If not solved, retain the original solution field
+            }
+            cout << "," << clues << "," << difficulty << "," << difficulty_range 
+                 << "," << result << "," 
+                 << fixed << setprecision(3) << elapsed_ms << "\n";
         }
     }
 
