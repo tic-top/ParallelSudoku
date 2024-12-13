@@ -52,7 +52,6 @@ int main() {
     // 循环读取数独输入
     while (true) {
         string puzzle;
-        cout << "Enter Sudoku (81 characters, 0 for empty cells), or 'exit' to quit: ";
         cin >> puzzle;
 
         // 用户输入 'exit' 时退出程序
@@ -80,7 +79,7 @@ int main() {
         if (!solved) {
             // 无解情况，这里根据需要处理，此处简单输出原题和时间
             // 实务中可以按需要改变行为
-            cout << puzzle << " " << elapsed_seconds.count() * 1000 << "ms" << "\n";
+            cout << puzzle << " " << elapsed_seconds.count() * 1000 << "\n";
         } else {
             // 输出解答（81位数字）和耗时
             for (int i = 0; i < N; i++) {
@@ -88,7 +87,7 @@ int main() {
                     cout << grid[i][j];
                 }
             }
-            cout << " " << elapsed_seconds.count() * 1000 << "ms" << "\n";
+            cout << " " << elapsed_seconds.count() * 1000 << "\n";
         }
     }
 

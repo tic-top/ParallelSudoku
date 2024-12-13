@@ -27,15 +27,16 @@ echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$outp
 # 初始化行计数
 line_count=0
 
+# 启动 serial 程序并保持其运行
+# 启动 serial 程序并让它处于等待状态，接收标准输入
+./serial &
+
+# 获取 serial 程序的进程ID
+serial_pid=$!
+
 # 统计总运行时间
-# 读取csv文件并处理
 st=$(date +%s)
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
-    # echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range" >> "$output_csv"
-    # 当处理满1000条后就停止
-    # if [ $line_count -ge 100 ]; then
-    #     break
-    # fi
     line_count=$((line_count + 1))
     puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
     solution=$(echo "$solution" | sed 's/\r//g' | tr -d '\n')
@@ -43,14 +44,17 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     difficulty=$(echo "$difficulty" | sed 's/\r//g' | tr -d '\n')
     difficulty_range=$(echo "$difficulty_range" | sed 's/\r//g' | tr -d '\n')
 
-    # 将quizzes作为输入传给程序并使用并行数p
-    
+    # 启动程序并传递数独题目
     start_time=$(date +%s%3N)
-    result_and_time=$(echo "$puzzle" | ./serial)
+
+    # 将数独通过管道传递给程序
+    result_and_time=$(echo "$puzzle" | tee /dev/tty | ./serial)
+    
+    # 计算运行时间
     end_time=$(date +%s%3N)
     elapsed_time=$((end_time - start_time))
 
-    # 假设输出格式是：result runtime
+    # 假设输出格式是：解答 runtime
     result=$(echo "$result_and_time" | awk '{print $1}')
     runtime=$(echo "$result_and_time" | awk '{print $2}')
     echo "Runtime: $runtime, Esttime: ${elapsed_time}ms"
@@ -58,5 +62,12 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     # 将结果写入CSV文件
     echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
 done
+
+# 向 serial 程序发送 "exit" 命令来退出
+echo "exit" > /dev/tty
+
+# 等待 serial 程序结束
+wait $serial_pid
+
 end_time=$(date +%s)
 echo "Total time: $((end_time - st))s"
