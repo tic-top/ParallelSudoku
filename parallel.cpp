@@ -147,11 +147,7 @@ int main(int argc, char* argv[]) {
         }
         double start = MPI_Wtime();
         queue<vector<int>> tasks;
-        auto initialExp = expandNode(initBoard);
-        for (auto &node : initialExp) {
-            tasks.push(node);
-        }
-
+        tasks.push(initBoard);
         ensureEnoughTasks(tasks, p);
         end = MPI_Wtime();
         cout << "Time BFS: " << (end - start)*1000 << "ms" << endl;
