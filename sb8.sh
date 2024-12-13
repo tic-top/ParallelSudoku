@@ -11,31 +11,38 @@
 #SBATCH --account=cse587f24_class
 #SBATCH --partition=standard
 
+p=8
 module load gcc
 module load openmpi
 mpic++ -O3 parallel.cpp -o main
+
 export UCX_LOG_LEVEL=error
+
 input_csv="sudoku.csv"
-output_csv="output8.csv"
+output_csv="output$p.csv"
 
 # 输出CSV表头
-echo "quizzes,solutions,result,runtime" > "$output_csv"
+echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$output_csv"
 
 line_count=0
-tail -n +2 "$input_csv" | while IFS=, read -r quizzes solutions; do
+tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
     # 当处理满1000条后就停止
-    if [ $line_count -ge 100 ]; then
-        break
-    fi
+    # if [ $line_count -ge 100 ]; then
+    #     break
+    # fi
     line_count=$((line_count + 1))
-    # quizzes和solutions是当前行的两列内容
-    # 将quizzes作为输入给程序
-    result_and_time=$(echo "$quizzes" | mpirun -n 8 ./main)
+    puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
+    solution=$(echo "$solution" | sed 's/\r//g' | tr -d '\n')
+    clues=$(echo "$clues" | sed 's/\r//g' | tr -d '\n')
+    difficulty=$(echo "$difficulty" | sed 's/\r//g' | tr -d '\n')
+    difficulty_range=$(echo "$difficulty_range" | sed 's/\r//g' | tr -d '\n')
+    result_and_time=$(echo "$puzzle" | mpirun -n $p ./main)
     
     # 假设输出格式是：result runtime
     result=$(echo "$result_and_time" | awk '{print $1}')
     runtime=$(echo "$result_and_time" | awk '{print $2}')
 
     # 将四个字段写入新的CSV文件中
-    echo "$quizzes,$solutions,$result,$runtime" >> "$output_csv"
+    echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
 done
+

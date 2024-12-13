@@ -27,9 +27,9 @@ echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$outp
 line_count=0
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
     # 当处理满1000条后就停止
-    if [ $line_count -ge 100 ]; then
-        break
-    fi
+    # if [ $line_count -ge 100 ]; then
+    #     break
+    # fi
     line_count=$((line_count + 1))
     puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
     solution=$(echo "$solution" | sed 's/\r//g' | tr -d '\n')
