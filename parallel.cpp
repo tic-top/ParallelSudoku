@@ -238,7 +238,7 @@ int main(int argc, char* argv[]) {
                 for (int i = 0; i < 81; i++) {
                     M_task[i/9][i%9] = task[i];
                 }
-
+                start = MPI_Wtime();
                 if (solveSudokuDFS(M_task)) {
                     end = MPI_Wtime();
                     cout << "Time DFS: " << (end - start)*1000 << "ms" << endl;
