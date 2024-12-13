@@ -147,9 +147,6 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < 81; i++) {
             initBoard[i] = puzzle[i] - '0';
         }
-
-        double start = MPI_Wtime();
-
         queue<vector<int>> tasks;
         // auto initialExp = expandNode(initBoard);
         // for (auto &node : initialExp) {
@@ -162,7 +159,7 @@ int main(int argc, char* argv[]) {
         int activeWorkers = p;
         bool solutionFound = false;
         vector<int> solutionBoard(81,0);
-
+        double start = MPI_Wtime();
         // 分配初始任务
         for (int w = 1; w <= p; w++) {
             if (tasks.empty()) {
