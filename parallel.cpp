@@ -147,6 +147,8 @@ int main(int argc, char* argv[]) {
             initBoard[i] = puzzle[i] - '0';
         }
 
+        double start = MPI_Wtime();
+
         queue<vector<int>> tasks;
         // auto initialExp = expandNode(initBoard);
         // for (auto &node : initialExp) {
@@ -170,8 +172,6 @@ int main(int argc, char* argv[]) {
                 MPI_Send(&task[0], 81, MPI_INT, w, TAG_SEND_TASK, MPI_COMM_WORLD);
             }
         }
-        double start = MPI_Wtime();
-
         // 主循环等待反馈
         while (activeWorkers > 0 && !solutionFound) {
             MPI_Status status;
