@@ -129,6 +129,12 @@ int main(int argc, char* argv[]) {
     double end = 0;
 
     int p = size - 1;
+    // ensure p>0
+    if (p <= 0) {
+        cout << "At least 1 worker is required." << endl;
+        MPI_Finalize();
+        return 0;
+    }
     
     if (rank == 0) {
         // Master
@@ -142,7 +148,7 @@ int main(int argc, char* argv[]) {
         double start = MPI_Wtime();
         queue<vector<int>> tasks;
         tasks.push(initBoard);
-        ensureEnoughTasks(tasks, 1 + p);
+        ensureEnoughTasks(tasks, p);
         // cout << "Time BFS: " << (MPI_Wtime() - start)*1000 << "ms create " << tasks.size() << endl;
 
         int activeWorkers = p;
@@ -177,7 +183,7 @@ int main(int argc, char* argv[]) {
             } else if (tag == TAG_SOLUTION_FAIL) {
                 int dummy;
                 MPI_Recv(&dummy, 1, MPI_INT, source, TAG_SOLUTION_FAIL, MPI_COMM_WORLD, &status);
-                // ensureEnoughTasks(tasks, p);
+                ensureEnoughTasks(tasks, p);
                 if (tasks.empty()) {
                     MPI_Send(NULL, 0, MPI_INT, source, TAG_NO_MORE_TASK, MPI_COMM_WORLD);
                     activeWorkers--;
