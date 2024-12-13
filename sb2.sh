@@ -11,19 +11,21 @@
 #SBATCH --account=cse587f24_class
 #SBATCH --partition=standard
 
+p=2
 module load gcc
 module load openmpi
 mpic++ -O3 parallel.cpp -o main
+
 export UCX_LOG_LEVEL=error
 
 input_csv="sudoku.csv"
-output_csv="output2.csv"
+output_csv="output$p.csv"
 
 # 输出CSV表头
-echo "quizzes,solutions,result,runtime" > "$output_csv"
+echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$output_csv"
 
 line_count=0
-tail -n +2 "$input_csv" | while IFS=, read -r quizzes solutions; do
+tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
     # 当处理满1000条后就停止
     if [ $line_count -ge 100 ]; then
         break
@@ -31,7 +33,7 @@ tail -n +2 "$input_csv" | while IFS=, read -r quizzes solutions; do
     line_count=$((line_count + 1))
     # quizzes和solutions是当前行的两列内容
     # 将quizzes作为输入给程序
-    result_and_time=$(echo "$quizzes" | mpirun -n 2 ./main)
+    result_and_time=$(echo "$quizzes" | mpirun -n $p ./main)
     
     # 假设输出格式是：result runtime
     result=$(echo "$result_and_time" | awk '{print $1}')
