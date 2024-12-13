@@ -35,6 +35,11 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
         break
     fi
     line_count=$((line_count + 1))
+    puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
+    solution=$(echo "$solution" | sed 's/\r//g' | tr -d '\n')
+    clues=$(echo "$clues" | sed 's/\r//g' | tr -d '\n')
+    difficulty=$(echo "$difficulty" | sed 's/\r//g' | tr -d '\n')
+    difficulty_range=$(echo "$difficulty_range" | sed 's/\r//g' | tr -d '\n')
 
     # 将quizzes作为输入传给程序并使用并行数p
     result_and_time=$(echo "$puzzle" | ./serial)

@@ -31,8 +31,11 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
         break
     fi
     line_count=$((line_count + 1))
-    # quizzes和solutions是当前行的两列内容
-    # 将quizzes作为输入给程序
+    puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
+    solution=$(echo "$solution" | sed 's/\r//g' | tr -d '\n')
+    clues=$(echo "$clues" | sed 's/\r//g' | tr -d '\n')
+    difficulty=$(echo "$difficulty" | sed 's/\r//g' | tr -d '\n')
+    difficulty_range=$(echo "$difficulty_range" | sed 's/\r//g' | tr -d '\n')
     result_and_time=$(echo "$puzzle" | mpirun -n $p ./main)
     
     # 假设输出格式是：result runtime
