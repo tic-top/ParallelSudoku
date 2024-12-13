@@ -210,7 +210,7 @@ int main(int argc, char* argv[]) {
             }
             cout << ' ';
             cout << (end - start)*1000 << endl;
-            cout << "final" << 1000 * (MPI_Wtime() - start) << endl;
+            // cout << "final" << 1000 * (MPI_Wtime() - start) << endl;
         } else {
             cout << "No solution found or no more tasks." << endl;
         }
