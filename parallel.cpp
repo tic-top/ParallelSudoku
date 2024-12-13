@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
         tasks.push(initBoard);
 
         distributeTasks(tasks, p, &end); // 动态任务分配
-        cout << ' ' << (end - start) * 1000 << endl;
+        cout << (end - start) * 1000 << endl;
     } else {
         // Worker
         bool running = true;
