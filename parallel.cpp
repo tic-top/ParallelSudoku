@@ -155,6 +155,7 @@ int main(int argc, char* argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     double end = 0;
+    double start = 0;
 
     int p = size - 1;
     // ensure p>0
@@ -173,7 +174,7 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < 81; i++) {
             initBoard[i] = puzzle[i] - '0';
         }
-        double start = MPI_Wtime();
+        start = MPI_Wtime();
         queue<vector<int>> tasks;
         tasks.push(initBoard);
 
