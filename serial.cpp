@@ -51,13 +51,21 @@ bool solveSudoku(int grid[N][N]) {
 int main() {
     // 循环读取数独输入
     while (true) {
-        string puzzle;
-        cin >> puzzle;
+        std::string puzzle;
+        if (!std::getline(std::cin, puzzle)) {
+            // 如果无法读取到行，说明输入结束或出错，break
+            break;
+        }
 
-        // 用户输入 'exit' 时退出程序
+        // 去除多余空白
+        if (puzzle.empty()) {
+            continue; // 遇到空行则继续等待下一行
+        }
+
         if (puzzle == "exit") {
             break;
         }
+
 
         // 将输入的81位字符转换为9x9整型数组
         int grid[N][N];
@@ -79,7 +87,7 @@ int main() {
         if (!solved) {
             // 无解情况，这里根据需要处理，此处简单输出原题和时间
             // 实务中可以按需要改变行为
-            cout << puzzle << " " << elapsed_seconds.count() * 1000 << "\n";
+            cout << puzzle << " " << (elapsed_seconds.count() * 1000) << std::endl;
         } else {
             // 输出解答（81位数字）和耗时
             for (int i = 0; i < N; i++) {
@@ -87,7 +95,7 @@ int main() {
                     cout << grid[i][j];
                 }
             }
-            cout << " " << elapsed_seconds.count() * 1000 << "\n";
+            cout << " " << elapsed_seconds.count() * 1000 << std::endl;
         }
     }
 
