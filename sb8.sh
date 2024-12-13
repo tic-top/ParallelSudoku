@@ -20,4 +20,4 @@ export UCX_LOG_LEVEL=error
 
 input_csv="sudoku.csv"
 output_csv="output$p.csv"
-mpirun -n $p ./main < "$input_csv" > "$output_csv"
+mpirun -np $p ./main  "$input_csv"  "$output_csv"
