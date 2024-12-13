@@ -20,38 +20,4 @@ export UCX_LOG_LEVEL=error
 
 input_csv="sudoku.csv"
 output_csv="output$p.csv"
-
-# 输出CSV表头
-echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$output_csv"
-
-line_count=0
-st=$(date +%s)
-tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
-    # 当处理满1000条后就停止
-    # if [ $line_count -ge 100 ]; then
-    #     break
-    # fi
-    line_count=$((line_count + 1))
-    puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
-    solution=$(echo "$solution" | sed 's/\r//g' | tr -d '\n')
-    clues=$(echo "$clues" | sed 's/\r//g' | tr -d '\n')
-    difficulty=$(echo "$difficulty" | sed 's/\r//g' | tr -d '\n')
-    difficulty_range=$(echo "$difficulty_range" | sed 's/\r//g' | tr -d '\n')
-    
-    start_time=$(date +%s%3N)
-    result_and_time=$(echo "$puzzle" | mpirun -n $p ./main)
-    end_time=$(date +%s%3N)
-    elapsed_time=$((end_time - start_time))
-
-    # 假设输出格式是：result runtime
-    result=$(echo "$result_and_time" | awk '{print $1}')
-    runtime=$(echo "$result_and_time" | awk '{print $2}')
-
-    elapsed_time=$((end_time - start_time))  # Get elapsed time in seconds
-    elapsed_time_ms=$((elapsed_time * 1000))  # Convert to milliseconds
-    echo "Runtime: $runtime, Esttime: ${elapsed_time}ms"
-    echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
-done
-end_time=$(date +%s)
-echo "Total time: $((end_time - st))s"
-
+mpirun -n $p ./main < "$input_csv" > "$output_csv"
