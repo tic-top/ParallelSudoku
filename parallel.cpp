@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
         queue<vector<int>> tasks;
         tasks.push(initBoard);
         ensureEnoughTasks(tasks, 1 + p);
-        cout << "Time BFS: " << (MPI_Wtime() - start)*1000 << "ms create " << tasks.size() << endl;
+        // cout << "Time BFS: " << (MPI_Wtime() - start)*1000 << "ms create " << tasks.size() << endl;
 
         int activeWorkers = p;
         bool solutionFound = false;
