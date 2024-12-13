@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
         queue<vector<int>> tasks;
         tasks.push(initBoard);
         ensureEnoughTasks(tasks, 1 + p);
-        cout << "Time BFS: " << (MPI_Wtime() - start)*1000 << "ms create " << tasks.size() << endl;
+        // cout << "Time BFS: " << (MPI_Wtime() - start)*1000 << "ms create " << tasks.size() << endl;
 
         int activeWorkers = p;
         bool solutionFound = false;
@@ -222,7 +222,7 @@ int main(int argc, char* argv[]) {
                 }
                 st = MPI_Wtime();
                 if (solveSudokuDFS(M_task)) {
-                    cout << "Time DFS: " << (MPI_Wtime() - st)*1000 << "ms" << endl;
+                    // cout << "Time DFS: " << (MPI_Wtime() - st)*1000 << "ms" << endl;
                     vector<int> sol(81);
                     for (int i = 0; i < 81; i++) {
                         sol[i] = M_task[i];
@@ -251,6 +251,6 @@ int main(int argc, char* argv[]) {
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
-    cout << "----------------------------------------" << endl;
+    // cout << "----------------------------------------" << endl;
     return 0;
 }
