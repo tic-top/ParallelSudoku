@@ -224,7 +224,7 @@ int main(int argc, char* argv[]) {
     if (rank == 0) {
         end = MPI_Wtime();
         cout << "Final: ";
-        cout << (end - start) * 1000 << endl;
+        cout << (end - start) * 1000 << 'ms'<< endl;
     }
     return 0;
 }
