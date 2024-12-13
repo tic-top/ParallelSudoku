@@ -9,5 +9,7 @@
 #SBATCH --account=cse587f24_class
 #SBATCH --partition=standard
 
+module load gcc
+g++ -O3 serial.cpp -o serial
 output_csv="output1.csv"
-./serial.exe < sudoku.csv > "$output_csv"
+./serial < sudoku.csv > "$output_csv"
