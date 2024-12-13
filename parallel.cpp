@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) {
             } else if (tag == TAG_SOLUTION_FAIL) {
                 int dummy;
                 MPI_Recv(&dummy, 1, MPI_INT, source, TAG_SOLUTION_FAIL, MPI_COMM_WORLD, &status);
-                ensureEnoughTasks(tasks, p);
+                // ensureEnoughTasks(tasks, p);
                 if (tasks.empty()) {
                     MPI_Send(NULL, 0, MPI_INT, source, TAG_NO_MORE_TASK, MPI_COMM_WORLD);
                     activeWorkers--;
