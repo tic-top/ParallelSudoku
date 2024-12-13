@@ -88,7 +88,7 @@ vector<vector<int>> expandNode(const vector<int> &board) {
 
 void ensureEnoughTasks(queue<vector<int>> &tasks, int p) {
     cout << "ensure part";
-    cout << (int) tasks.size() << p << endl;
+    cout << (int) tasks.size() << ' ' << p << endl;
     while ((int)tasks.size() < p+1) {
         if (tasks.empty()) return;
         vector<int> front = tasks.front();

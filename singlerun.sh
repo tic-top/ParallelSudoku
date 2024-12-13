@@ -32,6 +32,6 @@ tail -n +2 "$input_csv" | while IFS=, read -r quizzes solutions; do
     line_count=$((line_count + 1))
     # quizzes和solutions是当前行的两列内容
     # 将quizzes作为输入给程序
-    result_and_time=$(echo "$quizzes" | mpirun -n 1 ./main)
+    result_and_time=$(echo "$quizzes" | mpirun -n 4 ./main)
     echo "$result_and_time"
 done
