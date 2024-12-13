@@ -220,5 +220,10 @@ int main(int argc, char* argv[]) {
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
+    if (rank == 0) {
+        end = MPI_Wtime();
+        cout << "Final: ";
+        cout << (end - start) * 1000 << endl;
+    }
     return 0;
 }
