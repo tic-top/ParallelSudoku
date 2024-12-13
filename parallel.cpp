@@ -90,7 +90,7 @@ vector<vector<int>> expandNode(const vector<int> &board) {
     return result;
 }
 
-void distributeTasks(queue<vector<int>> &tasks, int p) {
+void distributeTasks(queue<vector<int>> &tasks, int p, double *end) {
     int activeWorkers = p;
     while (activeWorkers > 0) {
         MPI_Status status;
@@ -110,6 +110,7 @@ void distributeTasks(queue<vector<int>> &tasks, int p) {
             int tag = status.MPI_TAG;
 
             if (tag == TAG_SOLUTION_FOUND) {
+                *end = MPI_Wtime();
                 vector<int> solutionBoard(81);
                 MPI_Recv(&solutionBoard[0], 81, MPI_INT, source, TAG_SOLUTION_FOUND, MPI_COMM_WORLD, &status);
                 // 记录结果，发通知终止
@@ -176,10 +177,8 @@ int main(int argc, char* argv[]) {
         queue<vector<int>> tasks;
         tasks.push(initBoard);
 
-        distributeTasks(tasks, p); // 动态任务分配
-
-        end = MPI_Wtime();
-        cout << ' ' << end - start << endl;
+        distributeTasks(tasks, p, &end); // 动态任务分配
+        cout << ' ' << (end - start) * 1000 << endl;
     } else {
         // Worker
         bool running = true;
