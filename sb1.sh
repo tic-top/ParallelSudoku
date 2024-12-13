@@ -28,8 +28,8 @@ echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$outp
 mkfifo serial_in
 mkfifo serial_out
 
-# 启动serial程序，并让其从serial_in读入，从serial_out输出
-./serial < serial_in > serial_out &
+# 使用stdbuf强制行缓冲，以便read能及时读到输出
+stdbuf -oL ./serial < serial_in > serial_out &
 serial_pid=$!
 
 st=$(date +%s)
@@ -48,7 +48,7 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     # 将数独传给serial程序
     echo "$puzzle" > serial_in
 
-    # 从serial程序的输出中读取结果
+    # 从serial程序的输出中读取结果, read将会一直等待一行数据的到来
     read -r result_and_time < serial_out
 
     end_time=$(date +%s%3N)
