@@ -9,7 +9,6 @@ using namespace std;
 static const int N = 9;
 
 enum MessageTag {
-    TAG_REQUEST_TASK = 1,
     TAG_SEND_TASK,
     TAG_NO_MORE_TASK,
     TAG_SOLUTION_FOUND,
@@ -190,18 +189,7 @@ int main(int argc, char* argv[]) {
             } else if (tag == TAG_SOLUTION_FAIL) {
                 int dummy;
                 MPI_Recv(&dummy, 1, MPI_INT, source, TAG_SOLUTION_FAIL, MPI_COMM_WORLD, &status);
-                // ensureEnoughTasks(tasks, p);
-                if (tasks.empty()) {
-                    MPI_Send(NULL, 0, MPI_INT, source, TAG_NO_MORE_TASK, MPI_COMM_WORLD);
-                    activeWorkers--;
-                } else {
-                    auto task = tasks.front(); tasks.pop();
-                    MPI_Send(&task[0], 81, MPI_INT, source, TAG_SEND_TASK, MPI_COMM_WORLD);
-                }
-            } else if (tag == TAG_REQUEST_TASK) {
-                int dummy;
-                MPI_Recv(&dummy, 1, MPI_INT, source, TAG_REQUEST_TASK, MPI_COMM_WORLD, &status);
-                // ensureEnoughTasks(tasks, p);
+                ensureEnoughTasks(tasks, p);
                 if (tasks.empty()) {
                     MPI_Send(NULL, 0, MPI_INT, source, TAG_NO_MORE_TASK, MPI_COMM_WORLD);
                     activeWorkers--;
