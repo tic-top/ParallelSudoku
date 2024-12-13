@@ -216,7 +216,7 @@ int main(int argc, char* argv[]) {
 
         // Master结束前清理剩余消息
         clearMessageQueue();
-
+        cout << "final" << 1000 * (MPI_Wtime() - start) << endl;
     } else {
         // Worker
         double st, ed;
