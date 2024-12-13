@@ -13,7 +13,7 @@
 
 module load gcc
 module load openmpi
-mpic++ -O3 serial.cpp -o main
+g++ -O3 serial.cpp -o serial
 
 input_csv="sudoku.csv"
 output_csv="output1.csv"
@@ -30,7 +30,7 @@ tail -n +2 "$input_csv" | while IFS=, read -r quizzes solutions; do
     line_count=$((line_count + 1))
     # quizzes和solutions是当前行的两列内容
     # 将quizzes作为输入给程序
-    result_and_time=$(echo "$quizzes" | ./main)
+    result_and_time=$(echo "$quizzes" | ./serial)
     
     # 假设输出格式是：result runtime
     result=$(echo "$result_and_time" | awk '{print $1}')
