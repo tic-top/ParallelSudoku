@@ -151,6 +151,7 @@ int main(int argc, char* argv[]) {
         ensureEnoughTasks(tasks, p);
         end = MPI_Wtime();
         cout << "Time BFS: " << (end - start)*1000 << "ms" << endl;
+        cout << tasks.size() << endl;
 
         int activeWorkers = p;
         bool solutionFound = false;
