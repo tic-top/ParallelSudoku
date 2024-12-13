@@ -13,7 +13,7 @@
 
 module load gcc
 module load openmpi
-mpic++ -O3 serial.cpp -o main
+mpic++ -O3 parallel.cpp -o main
 export UCX_LOG_LEVEL=error
 #!/usr/bin/env bash
 
