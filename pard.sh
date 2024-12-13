@@ -17,6 +17,8 @@ mpic++ -O3 parallel.cpp -o main
 export UCX_LOG_LEVEL=error
 # echo 000000010400000000020000000000050407008000300001090000300400200050100000000806000 | mpirun -n 4 ./main
 echo "pard" >> result.txt
+start=`date +%s`
 echo 000070030000003020056200089000064001007000000090080005900005000000037910280000000 | mpirun -n 16 ./main >> result.txt
-
-    
+end=`date +%s`
+runtime=$((end-start))
+echo "Elapse: $runtime" >> result.txt
