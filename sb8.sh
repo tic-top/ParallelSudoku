@@ -36,11 +36,17 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     clues=$(echo "$clues" | sed 's/\r//g' | tr -d '\n')
     difficulty=$(echo "$difficulty" | sed 's/\r//g' | tr -d '\n')
     difficulty_range=$(echo "$difficulty_range" | sed 's/\r//g' | tr -d '\n')
-    result_and_time=$(echo "$puzzle" | mpirun -n $p ./main)
     
+    start_time=$(date +%s)
+    result_and_time=$(echo "$puzzle" | mpirun -n $p ./main)
+    end_time=$(date +%s)
+
     # 假设输出格式是：result runtime
     result=$(echo "$result_and_time" | awk '{print $1}')
     runtime=$(echo "$result_and_time" | awk '{print $2}')
+
+    # echo runtime and (start-end)*1000 ms
+    echo "Runtime: $runtime, Esttime: $((end_time - start_time)*1000)ms"
 
     # 将四个字段写入新的CSV文件中
     echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
