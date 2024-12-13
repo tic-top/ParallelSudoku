@@ -71,6 +71,7 @@ vector<vector<int>> expandNode(const vector<int> &board) {
             break;
         }
     }
+    // this means that we have found the result
     if (pos == -1) return result;
     int row = pos / 9, col = pos % 9;
 
@@ -91,11 +92,15 @@ vector<vector<int>> expandNode(const vector<int> &board) {
 
 void ensureEnoughTasks(queue<vector<int>> &tasks, int p) {
     while ((int)tasks.size() < p+1) {
-        cout << "taks num: " << tasks.size() << endl;
         if (tasks.empty()) return;
         vector<int> front = tasks.front();
         tasks.pop();
         auto newNodes = expandNode(front);
+        if (newNodes.empty()) {
+            tasks.push(front);
+            // that means we almost found the answer
+            return;
+        }
         for (auto &node : newNodes) {
             tasks.push(node);
         }
