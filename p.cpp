@@ -16,47 +16,45 @@ enum MessageTag {
     TAG_TERMINATE
 };
 
-bool isValid(const int M[81], int row, int col, int val) {
-    // 检查行
+bool isValid(int M[N][N], int row, int col, int val) {
     for (int j = 0; j < N; j++) {
-        if (M[row*9 + j] == val) return false;
+        if (M[row][j] == val) return false;
     }
-    // 检查列
     for (int i = 0; i < N; i++) {
-        if (M[i*9 + col] == val) return false;
+        if (M[i][col] == val) return false;
     }
-    // 检查3x3格子
     int startRow = (row / 3)*3;
     int startCol = (col / 3)*3;
     for (int i = startRow; i < startRow + 3; i++) {
         for (int j = startCol; j < startCol + 3; j++) {
-            if (M[i*9 + j] == val) return false;
+            if (M[i][j] == val) return false;
         }
     }
     return true;
 }
 
-bool findEmpty(const int M[81], int &row, int &col) {
-    for (int i = 0; i < 81; i++) {
-        if (M[i] == 0) {
-            row = i / 9; 
-            col = i % 9;
-            return true;
+bool findEmpty(int M[N][N], int &row, int &col) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (M[i][j] == 0) {
+                row = i; col = j;
+                return true;
+            }
         }
     }
     return false;
 }
 
-bool solveSudokuDFS(int M[81]) {
+bool solveSudokuDFS(int M[N][N]) {
     int row, col;
     if (!findEmpty(M, row, col)) {
         return true;
     }
     for (int num = 1; num <= 9; num++) {
         if (isValid(M, row, col, num)) {
-            M[row*9 + col] = num;
+            M[row][col] = num;
             if (solveSudokuDFS(M)) return true;
-            M[row*9 + col] = 0;
+            M[row][col] = 0;
         }
     }
     return false;
@@ -73,10 +71,9 @@ vector<vector<int>> expandNode(const vector<int> &board) {
     }
     if (pos == -1) return result;
     int row = pos / 9, col = pos % 9;
-
-    int Mtmp[81];
+    int Mtmp[9][9];
     for (int i = 0; i < 81; i++) {
-        Mtmp[i] = board[i];
+        Mtmp[i/9][i%9] = board[i];
     }
 
     for (int num = 1; num <= 9; num++) {
@@ -90,6 +87,8 @@ vector<vector<int>> expandNode(const vector<int> &board) {
 }
 
 void ensureEnoughTasks(queue<vector<int>> &tasks, int p) {
+    // cout << "ensure part";
+    // cout << (int) tasks.size() << ' ' << p << endl;
     while ((int)tasks.size() < p+1) {
         if (tasks.empty()) return;
         vector<int> front = tasks.front();
@@ -98,6 +97,21 @@ void ensureEnoughTasks(queue<vector<int>> &tasks, int p) {
         for (auto &node : newNodes) {
             tasks.push(node);
         }
+    }
+}
+
+void intArrayToBoard(const int arr[N][N], vector<int> &board) {
+    board.resize(81);
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            board[i*9 + j] = arr[i][j];
+        }
+    }
+}
+
+void boardToIntArray(const vector<int> &board, int arr[N][N]) {
+    for (int i = 0; i < 81; i++) {
+        arr[i/9][i%9] = board[i];
     }
 }
 
@@ -123,7 +137,7 @@ int main(int argc, char* argv[]) {
     double end = 0;
 
     int p = size - 1;
-    
+    static int M_global[N][N];
     if (rank == 0) {
         // Master
         string puzzle;
@@ -176,6 +190,7 @@ int main(int argc, char* argv[]) {
                 if (tasks.empty()) {
                     MPI_Send(NULL, 0, MPI_INT, source, TAG_NO_MORE_TASK, MPI_COMM_WORLD);
                     activeWorkers--;
+                    // cout << "Worker " << source << " has no more tasks." << endl;
                 } else {
                     auto task = tasks.front(); tasks.pop();
                     MPI_Send(&task[0], 81, MPI_INT, source, TAG_SEND_TASK, MPI_COMM_WORLD);
@@ -189,13 +204,17 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // 只能打印一次，防止有多个解
+
         if (solutionFound && !hasprinted) {
             hasprinted = true;
-            for (int i = 0; i < 81; i++) {
-                cout << solutionBoard[i];
-            }
+            int SolM[9][9];
+            boardToIntArray(solutionBoard, SolM);
+            for (int i = 0; i < 9; i++) 
+                for (int j = 0; j < 9; j++) 
+                    cout << SolM[i][j];
             cout << ' ';
-            cout << (end - start)*1000 << endl;
+            cout << (end - start)*1000<<endl; 
         } else {
             cout << "No solution found or no more tasks." << endl;
         }
@@ -206,7 +225,6 @@ int main(int argc, char* argv[]) {
     } else {
         // Worker
         bool running = true;
-        double start, finish;
         while (running) {
             MPI_Status status;
             MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
@@ -216,17 +234,17 @@ int main(int argc, char* argv[]) {
                 vector<int> task(81,0);
                 MPI_Recv(&task[0], 81, MPI_INT, 0, TAG_SEND_TASK, MPI_COMM_WORLD, &status);
 
-                int M_task[81];
+                int M_task[9][9];
                 for (int i = 0; i < 81; i++) {
-                    M_task[i] = task[i];
+                    M_task[i/9][i%9] = task[i];
                 }
                 start = MPI_Wtime();
                 if (solveSudokuDFS(M_task)) {
-                    finish = MPI_Wtime();
-                    cout << "Time DFS: " << (finish - start)*1000 << "ms" << endl;
+                    end = MPI_Wtime();
+                    cout << "Time DFS: " << (end - start)*1000 << "ms" << endl;
                     vector<int> sol(81);
                     for (int i = 0; i < 81; i++) {
-                        sol[i] = M_task[i];
+                        sol[i] = M_task[i/9][i%9];
                     }
                     MPI_Send(&sol[0], 81, MPI_INT, 0, TAG_SOLUTION_FOUND, MPI_COMM_WORLD);
                     running = false;
@@ -250,6 +268,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // 全局同步，确保所有消息处理完毕再结束
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
     return 0;
