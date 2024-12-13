@@ -44,16 +44,15 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
 
     # 将quizzes作为输入传给程序并使用并行数p
     
-    start_time=$(date +%s)
+    start_time=$(date +%s%3N)
     result_and_time=$(echo "$puzzle" | ./serial)
-    end_time=$(date +%s)
+    end_time=$(date +%s%3N)
+    elapsed_time=$((end_time - start_time))
 
     # 假设输出格式是：result runtime
     result=$(echo "$result_and_time" | awk '{print $1}')
     runtime=$(echo "$result_and_time" | awk '{print $2}')
-    elapsed_time=$((end_time - start_time))  # Get elapsed time in seconds
-    elapsed_time_ms=$((elapsed_time * 1000))  # Convert to milliseconds
-    echo "Runtime: $runtime, Esttime: ${elapsed_time_ms}ms"
+    echo "Runtime: $runtime, Esttime: ${elapsed_time}ms"
 
     # 将结果写入CSV文件
     echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
