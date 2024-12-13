@@ -149,12 +149,13 @@ int main(int argc, char* argv[]) {
         }
 
         queue<vector<int>> tasks;
-        auto initialExp = expandNode(initBoard);
-        for (auto &node : initialExp) {
-            tasks.push(node);
-        }
+        // auto initialExp = expandNode(initBoard);
+        // for (auto &node : initialExp) {
+        //     tasks.push(node);
+        // }
 
-        ensureEnoughTasks(tasks, p);
+        // ensureEnoughTasks(tasks, p);
+        tasks.push(initBoard);
 
         int activeWorkers = p;
         bool solutionFound = false;
