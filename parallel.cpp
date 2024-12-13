@@ -191,12 +191,14 @@ int main(int argc, char* argv[]) {
                 if (tasks.empty()) {
                     MPI_Send(NULL, 0, MPI_INT, source, TAG_NO_MORE_TASK, MPI_COMM_WORLD);
                     activeWorkers--;
+                    cout << "Worker " << source << " has no more tasks." << endl;
                 } else {
                     auto task = tasks.front(); tasks.pop();
                     MPI_Send(&task[0], 81, MPI_INT, source, TAG_SEND_TASK, MPI_COMM_WORLD);
                 }
             } else {
                 // 不期望的消息
+                cout << "Unexpected message from worker " << source << " with tag " << tag << endl;
                 MPI_Recv(NULL, 0, MPI_INT, source, tag, MPI_COMM_WORLD, &status);
                 MPI_Send(NULL, 0, MPI_INT, source, TAG_TERMINATE, MPI_COMM_WORLD);
                 activeWorkers--;
