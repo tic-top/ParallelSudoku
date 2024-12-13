@@ -24,13 +24,18 @@ output_csv="output1.csv"
 # 输出CSV表头
 echo "puzzle,solution,clues,difficulty,difficulty_range,result,runtime" > "$output_csv"
 
-# 使用 coproc 启动 serial 程序并保持其运行
-coproc SER { ./serial; }
+# 创建命名管道
+mkfifo serial_in
+mkfifo serial_out
+
+# 启动serial程序，并让其从serial_in读入，从serial_out输出
+./serial < serial_in > serial_out &
+serial_pid=$!
 
 st=$(date +%s)
 line_count=0
 
-# 从 CSV 文件中读取数据并逐条处理
+# 从 CSV 文件中读取数据并处理
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
     line_count=$((line_count + 1))
     puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
@@ -40,12 +45,11 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     difficulty_range=$(echo "$difficulty_range" | sed 's/\r//g' | tr -d '\n')
 
     start_time=$(date +%s%3N)
-    # 将数独传给已运行的serial程序
-    echo "$puzzle" >&"${SER[1]}"
+    # 将数独传给serial程序
+    echo "$puzzle" > serial_in
 
-    # 从serial程序读回结果
-    # 假设serial在输出完结果后立即换行，所以我们可以直接read
-    read -r result_and_time <&"${SER[0]}"
+    # 从serial程序的输出中读取结果
+    read -r result_and_time < serial_out
 
     end_time=$(date +%s%3N)
     elapsed_time=$((end_time - start_time))
@@ -53,18 +57,20 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     # 假设输出格式为：result runtime
     result=$(echo "$result_and_time" | awk '{print $1}')
     runtime=$(echo "$result_and_time" | awk '{print $2}')
-
     echo "Runtime: $runtime, Esttime: ${elapsed_time}ms"
 
     # 将结果写入CSV文件
     echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
 done
 
-# 所有题目处理完后，向serial程序发送exit指令，让其停止
-echo "exit" >&"${SER[1]}"
+# 所有题目处理完后，通知serial程序退出
+echo "exit" > serial_in
 
 # 等待serial程序退出
-wait "${SER_PID}"
+wait $serial_pid
+
+# 清理命名管道
+rm serial_in serial_out
 
 end_time=$(date +%s)
 echo "Total time: $((end_time - st))s"
