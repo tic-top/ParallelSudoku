@@ -150,9 +150,9 @@ int main(int argc, char* argv[]) {
         double start = MPI_Wtime();
         queue<vector<int>> tasks;
         tasks.push(initBoard);
-        ensureEnoughTasks(tasks, 8 * p);
+        ensureEnoughTasks(tasks, 2 * p);
         end = MPI_Wtime();
-        cout << "Time BFS: " << (end - start)*1000 << "ms create" << tasks.size() << endl;
+        cout << "Time BFS: " << (end - start)*1000 << "ms create " << tasks.size() << endl;
 
         int activeWorkers = p;
         bool solutionFound = false;
