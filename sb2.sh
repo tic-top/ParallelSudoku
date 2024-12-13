@@ -42,10 +42,9 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     # 假设输出格式是：result runtime
     result=$(echo "$result_and_time" | awk '{print $1}')
     runtime=$(echo "$result_and_time" | awk '{print $2}')
-
+    elapsed_time=$((end_time - start_time))  # Get elapsed time in seconds
+    elapsed_time_ms=$((elapsed_time * 1000))  # Convert to milliseconds
+    echo "Runtime: $runtime, Esttime: ${elapsed_time_ms}ms"
     # 将四个字段写入新的CSV文件中
     echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
 done
-end_time=$(date +%s)
-echo "Total time: $((end_time - start_time))s"
-
