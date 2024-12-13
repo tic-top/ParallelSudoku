@@ -192,7 +192,7 @@ int main(int argc, char* argv[]) {
                 if (tasks.empty()) {
                     MPI_Send(NULL, 0, MPI_INT, source, TAG_NO_MORE_TASK, MPI_COMM_WORLD);
                     activeWorkers--;
-                    cout << "Worker " << source << " has no more tasks." << endl;
+                    // cout << "Worker " << source << " has no more tasks." << endl;
                 } else {
                     auto task = tasks.front(); tasks.pop();
                     MPI_Send(&task[0], 81, MPI_INT, source, TAG_SEND_TASK, MPI_COMM_WORLD);
