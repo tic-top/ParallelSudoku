@@ -70,7 +70,7 @@ bool solveSudokuDFS(int M[81]) {
 }
 
 // Function to distribute tasks to workers
-void distributeTasks(queue<vector<int>> &tasks, int p, double *end, ostream &outputFile, bool &terminateAll) {
+void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ostream &outputFile, bool &terminateAll) {
     int activeWorkers = p;
     terminateAll = false;
 
@@ -92,14 +92,14 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double *end, ostream &out
             int tag = status.MPI_TAG;
 
             if (tag == TAG_SOLUTION_FOUND) {
-                *end = MPI_Wtime();
+                double end = MPI_Wtime();
                 vector<int> solutionBoard(81);
                 MPI_Recv(&solutionBoard[0], 81, MPI_INT, source, TAG_SOLUTION_FOUND, MPI_COMM_WORLD, &status);
                 // Output the solution
                 for (int i = 0; i < 81; i++) {
                     outputFile << solutionBoard[i];
                 }
-                outputFile << ' ' << fixed << setprecision(3) << (*end) << "\n";
+                outputFile << ' ' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
                 // Notify all workers to terminate
                 for (int w = 1; w <= p; w++) {
                     if (w != source) {
@@ -141,8 +141,6 @@ int main(int argc, char* argv[]) {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    double end = 0;
-    double start = 0;
     int p = size - 1; // Number of worker processes
 
     // Ensure at least one worker is available
@@ -293,7 +291,7 @@ int main(int argc, char* argv[]) {
 
             // Distribute tasks and solve
             bool terminateAll = false;
-            distributeTasks(tasks, p, &end, outputFile, terminateAll);
+            distributeTasks(tasks, p, taskStartTime, outputFile, terminateAll);
 
             if (!terminateAll) {
                 // If no solution was found
