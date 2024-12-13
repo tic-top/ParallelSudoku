@@ -44,6 +44,5 @@ tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty d
     runtime=$(echo "$result_and_time" | awk '{print $2}')
 
     # 将结果写入CSV文件
-    echo "$difficulty_range" >> "$output_csv"
-    # echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
+    echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range,$result,$runtime" >> "$output_csv"
 done
