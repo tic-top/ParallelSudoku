@@ -136,7 +136,6 @@ int main(int argc, char* argv[]) {
 
     int p = size - 1;
     static int M_global[N][N];
-
     if (rank == 0) {
         // Master
         string puzzle;
@@ -146,6 +145,7 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < 81; i++) {
             initBoard[i] = puzzle[i] - '0';
         }
+        double start = MPI_Wtime();
         queue<vector<int>> tasks;
         auto initialExp = expandNode(initBoard);
         for (auto &node : initialExp) {
@@ -153,12 +153,12 @@ int main(int argc, char* argv[]) {
         }
 
         ensureEnoughTasks(tasks, p);
-        tasks.push(initBoard);
+        end = MPI_Wtime();
+        cout << "Time BFS: " << (end - start)*1000 << "ms" << endl;
 
         int activeWorkers = p;
         bool solutionFound = false;
         vector<int> solutionBoard(81,0);
-        double start = MPI_Wtime();
         // 分配初始任务
         for (int w = 1; w <= p; w++) {
             if (tasks.empty()) {
@@ -178,6 +178,7 @@ int main(int argc, char* argv[]) {
 
             if (tag == TAG_SOLUTION_FOUND) {
                 end = MPI_Wtime();
+                cout << "Time DFS: " << (end - start)*1000 << "ms" << endl;
                 MPI_Recv(&solutionBoard[0], 81, MPI_INT, source, TAG_SOLUTION_FOUND, MPI_COMM_WORLD, &status);
                 solutionFound = true;
                 // 通知其他worker终止
