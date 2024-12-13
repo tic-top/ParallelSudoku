@@ -205,6 +205,8 @@ int main(int argc, char* argv[]) {
 
     } else {
         // Worker
+        double st, ed;
+        st = MPI_Wtime();
         bool running = true;
         while (running) {
             MPI_Status status;
@@ -220,6 +222,8 @@ int main(int argc, char* argv[]) {
                     M_task[i] = task[i];
                 }
                 if (solveSudokuDFS(M_task)) {
+                    ed = MPI_Wtime();
+                    cout << "Time DFS: " << (ed - st)*1000 << "ms" << endl;
                     vector<int> sol(81);
                     for (int i = 0; i < 81; i++) {
                         sol[i] = M_task[i];
