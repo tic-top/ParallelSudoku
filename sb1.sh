@@ -5,7 +5,7 @@
 #SBATCH --job-name=sudoku
 #SBATCH --mail-type=BEGIN,END
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=4
+#SBATCH --ntasks-per-node=1
 #SBATCH --mem-per-cpu=1g
 #SBATCH --time=00:05:00
 #SBATCH --account=cse587f24_class
@@ -29,12 +29,12 @@ line_count=0
 
 # 读取csv文件并处理
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
-    echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range"
-    # # 当处理满1000条后就停止
-    # if [ $line_count -ge 100 ]; then
-    #     break
-    # fi
-    # line_count=$((line_count + 1))
+    echo "$puzzle,$solution,$clues,$difficulty,$difficulty_range" >> "$output_csv"
+    # 当处理满1000条后就停止
+    if [ $line_count -ge 100 ]; then
+        break
+    fi
+    line_count=$((line_count + 1))
 
     # # 将quizzes作为输入传给程序并使用并行数p
     # result_and_time=$(echo "$puzzle" | ./serial)
