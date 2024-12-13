@@ -13,7 +13,6 @@
 
 # Load necessary modules
 module load gcc
-module load openmpi
 
 # Compile the serial code
 g++ -O3 serial.cpp -o serial
@@ -37,6 +36,7 @@ line_count=0
 
 # 从 CSV 文件中读取数据并处理
 tail -n +2 "$input_csv" | while IFS=, read -r puzzle solution clues difficulty difficulty_range; do
+    echo "Processing line $line_count..."
     line_count=$((line_count + 1))
     puzzle=$(echo "$puzzle" | sed 's/\r//g' | tr -d '\n')
     solution=$(echo "$solution" | sed 's/\r//g' | tr -d '\n')
