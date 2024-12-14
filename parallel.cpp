@@ -145,6 +145,7 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             return;
         }
     }
+    cout << "created " << tasks.size() << endl;
 
     // 第一批的题目发放
     MPI_Status status;
@@ -159,8 +160,9 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             workingservents++;
         }
     }
+    cout << "remain " << tasks.size() << "numworker " << workingservents<< endl;
 
-    cout << "created " << tasks.size() << endl;
+    
 
     // 确保有解
     while (workingservents>0)
