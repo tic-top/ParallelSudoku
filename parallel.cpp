@@ -445,6 +445,9 @@ int main(int argc, char *argv[])
                 running = false;
             }
         }
+        if (!runninng){
+            cout << "not running!" << endl;
+        }
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
