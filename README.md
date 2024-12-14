@@ -2,7 +2,7 @@
 Author: kirp@umich.edu
 
 ## Usage
-- `bash download.sh` to download the benchmark.
+- `~~bash download.sh` to download the benchmark.~~ I have added the benchmark in the repo.(sodoku.csv)
 - `run bash.sh` on Greatlake Server.
 - [The report](results\EECS587_Sokudo_Solver_Final_Report.pdf) is in the results folder.
 
