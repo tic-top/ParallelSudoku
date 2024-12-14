@@ -117,6 +117,12 @@ int expandtasks(vector<int> &task, queue<vector<int>> &tasks)
         return 2; // no solution
 }
 
+void clearQueue(std::queue<std::vector<int>> &tasks) {
+    while (!tasks.empty()) {
+        tasks.pop();
+    }
+}
+
 // Function to distribute tasks to workers
 void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ostream &outputFile, bool &solved)
 {
@@ -174,8 +180,7 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             outputFile << ',' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
             solved=true;
             workingservents--;
-            // clear the tasks
-            tasks = queue<vector<int>>();
+            clearQueue(tasks);
         }
         else if (tag == TAG_SOLUTION_FAIL)
         {
