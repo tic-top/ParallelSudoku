@@ -182,14 +182,9 @@ int main() {
                  << difficulty << "," << difficulty_range 
                  << "," << result << "," << "0\n";
         } else {
-            cout << puzzle << ",";
-            if (solved) {
-                cout << solvedPuzzle;
-            } else {
-                cout << solution; // If not solved, retain the original solution field
-            }
+            cout << puzzle << "," << solution;
             cout << "," << clues << "," << difficulty << "," << difficulty_range 
-                 << "," << result << "," 
+                 << "," << solvedPuzzle << "," 
                  << fixed << setprecision(3) << elapsed_ms << "\n";
         }
     }

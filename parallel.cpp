@@ -71,7 +71,7 @@ bool solveSudokuDFS(int M[81]) {
 
 int expandtasks(vector<int> &task, queue<vector<int>> &tasks) {
     int row, col;
-    // change task to int array t
+    // change task to int array tas
     int tas[81];
     for (int i = 0; i < 81; i++) {
         tas[i] = task[i];
