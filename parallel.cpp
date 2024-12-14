@@ -83,7 +83,10 @@ int expandtasks(vector<int> &task, qeque<vector<int>> &tasks) {
             expanded++;
         }
     }
-    return (expanded > 0); // no reasonable solution
+    if (expanded > 0)
+        return 1; // expanded
+    else
+        return 2; // no solution
 }
 
 // Function to distribute tasks to workers
