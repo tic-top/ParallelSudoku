@@ -173,6 +173,7 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             }
             outputFile << ',' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
             solved=true;
+            workingservents--;
             // clear the tasks
             tasks = queue<vector<int>>();
         }
