@@ -2,7 +2,7 @@
 # (See https://arc-ts.umich.edu/greatlakes/user-guide/ for command details)
 # Set up batch job settings
 
-#SBATCH --job-name=sudoku
+#SBATCH --job-name=sudoku_16
 #SBATCH --mail-type=BEGIN,END
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=16
@@ -15,10 +15,12 @@ p=16
 module load gcc
 module load openmpi
 mpic++ -O3 parallel.cpp -o main
-
 export UCX_LOG_LEVEL=error
 
 input_csv="sudoku.csv"
 output_csv="output$p.csv"
 
+start=$(date +%s)
 mpirun -np $p ./main  "$input_csv"  "$output_csv"
+end=$(date +%s)
+echo "Execution time: $((end-start)) seconds"
