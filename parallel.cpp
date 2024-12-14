@@ -181,6 +181,7 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             solved=true;
             workingservents--;
             clearQueue(tasks);
+            cout << workingservents;
         }
         else if (tag == TAG_SOLUTION_FAIL)
         {
@@ -195,9 +196,6 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
                 workingservents--;
             }
         }
-    }
-    if (workingservents==0){
-        cout << "all svr stop" << endl;
     }
 }
 
