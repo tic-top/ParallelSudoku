@@ -160,6 +160,8 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
         }
     }
 
+    cout << "created " << tasks.size() << endl;
+
     // 确保有解
     while (workingservents>0)
     {
