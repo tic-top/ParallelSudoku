@@ -7,8 +7,10 @@ Author: kirp@umich.edu
 `run bash.sh` on Greatlake Server.
 
 ## Data distribution
-We have sampled 7034 from the Sodoku-3m dataset.
+We have sampled 7034 from the [Sodoku-3m dataset](https://www.kaggle.com/datasets/radcliffe/3-million-sudoku-puzzles-with-ratings). You can download our benchmark with `bash download.sh`.
 
 ![sample_distribution](sample_distribution.png)
 ## Result
-![hi](result.png)
+![Time](result_time.png)
+![Speedup](speedup.png)
+![Efficiency](efficiency.png)
