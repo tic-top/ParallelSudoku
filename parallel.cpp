@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     int p = size - 1; // Number of worker processes
-
+    cout << p << endl;
     // Ensure at least one worker is available
     if (p <= 0)
     {
@@ -335,7 +335,7 @@ int main(int argc, char *argv[])
             string difficulty_range = fields[4];
             // 把这几个先输出
             outputFile << puzzle << "," << solution << "," << clues << "," << difficulty << "," << difficulty_range << ",";
-
+            cout << "Solve quiz" << puzzle << endl;
             // Validate puzzle length
             if (puzzle.length() != 81)
             {
