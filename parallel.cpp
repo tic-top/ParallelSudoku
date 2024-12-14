@@ -15,11 +15,9 @@ static const int N = 9;
 enum MessageTag
 {
     TAG_SEND_TASK,
-    TAG_NO_MORE_TASK,
     TAG_SOLUTION_FOUND,
     TAG_SOLUTION_FAIL,
-    TAG_TERMINATE,
-    TAG_CANCEL_TASK
+    TAG_TERMINATE
 };
 
 // Function to check if placing val at grid[row][col] is valid
@@ -182,11 +180,11 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             }
             outputFile << ',' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
             solved=true;
-            
             clearQueue(tasks);
         }
         else if (tag == TAG_SOLUTION_FAIL)
         {
+            cout << "Recv Failure"<< endl;
             MPI_Recv(NULL, 1, MPI_INT, source, TAG_SOLUTION_FAIL, MPI_COMM_WORLD, &status);
             // Continue assigning tasks if available
             if (!tasks.empty())
@@ -422,8 +420,8 @@ int main(int argc, char *argv[])
                 int taskData[81];
                 MPI_Recv(&taskData, 81, MPI_INT, 0, TAG_SEND_TASK, MPI_COMM_WORLD, &status);
                 // Solve the puzzle
-                bool solved = solveSudokuDFS(taskData);
-                if (solved)
+                bool found = solveSudokuDFS(taskData);
+                if (found)
                 {
                     // Send the solution back
                     vector<int> solutionBoard(81, 0);
