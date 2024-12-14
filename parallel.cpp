@@ -69,7 +69,7 @@ bool solveSudokuDFS(int M[81]) {
     return false; // Trigger backtracking
 }
 
-int expandtasks(vector<int> &task, qeque<vector<int>> &tasks) {
+int expandtasks(vector<int> &task, queue<vector<int>> &tasks) {
     int row, col;
     if (!findEmpty(task, row, col)) {
         return 0; // 0 solved
