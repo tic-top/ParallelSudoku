@@ -145,7 +145,7 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             return;
         }
     }
-    cout << "created " << tasks.size() << endl;
+    cout << "created: " << tasks.size() << endl;
 
     // 第一批的题目发放
     MPI_Status status;
@@ -160,19 +160,18 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             workingservents++;
         }
     }
-    cout << "remain " << tasks.size() << "numworker " << workingservents<< endl;
-
-    
-
+    cout << "remain: " << tasks.size() << " numworker: " << workingservents<< endl;
     // 确保有解
     while (workingservents>0)
     {
         MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         int source = status.MPI_SOURCE;
         int tag = status.MPI_TAG;
-
+        cout << "remain: " << tasks.size() << " numworker: " << workingservents<< endl;
         if (tag == TAG_SOLUTION_FOUND)
         {
+            workingservents--;
+            cout << "Found, numworker: " << workingservents << endl;
             double end = MPI_Wtime();
             vector<int> solutionBoard(81);
             MPI_Recv(&solutionBoard[0], 81, MPI_INT, source, TAG_SOLUTION_FOUND, MPI_COMM_WORLD, &status);
@@ -183,9 +182,8 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             }
             outputFile << ',' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
             solved=true;
-            workingservents--;
+            
             clearQueue(tasks);
-            cout << workingservents;
         }
         else if (tag == TAG_SOLUTION_FAIL)
         {
