@@ -196,6 +196,9 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             }
         }
     }
+    if (workingservents==0){
+        cout << "all svr stop" << endl;
+    }
 }
 
 // Function to clear any remaining messages in the queue
