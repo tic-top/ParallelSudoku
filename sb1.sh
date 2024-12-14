@@ -9,6 +9,7 @@
 #SBATCH --account=cse587f24_class
 #SBATCH --partition=standard
 
+p=1
 module load gcc
 g++ -O3 serial.cpp -o serial
 output_csv="output1.csv"
@@ -16,4 +17,4 @@ output_csv="output1.csv"
 start=$(date +%s)
 ./serial < sudoku.csv > "$output_csv"
 end=$(date +%s)
-echo "Execution time: $((end-start)) seconds"
+echo "$p Execution time: $((end-start)) seconds"

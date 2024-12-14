@@ -23,4 +23,4 @@ output_csv="output$p.csv"
 start=$(date +%s)
 mpirun -np $p ./main  "$input_csv"  "$output_csv"
 end=$(date +%s)
-echo "Execution time: $((end-start)) seconds"
+echo "$p Execution time: $((end-start)) seconds"
