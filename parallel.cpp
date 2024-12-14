@@ -445,7 +445,7 @@ int main(int argc, char *argv[])
                 running = false;
             }
         }
-        if (!runninng){
+        if (!running){
             cout << "not running!" << endl;
         }
     }
