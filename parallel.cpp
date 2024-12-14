@@ -70,21 +70,18 @@ bool solveSudokuDFS(int M[81]) {
 }
 
 int expandtasks(vector<int> &task, queue<vector<int>> &tasks) {
-    int row=-1, col=-1;
+    int row, col;
+    // change task to int array t
+    int tas[81];
     for (int i = 0; i < 81; i++) {
-        if (task[i] == 0) {
-            row = i / 9;
-            col = i % 9;
-            break;
-        }
+        tas[i] = task[i];
     }
-    if (row==-1 && col==-1) {
-        // No empty cell found, puzzle solved
-        return 0;
+    if (!findEmpty(tas, row, col)) {
+        return 0; // 0 solved
     }
     int expanded = 0;
     for (int num = 1; num <= 9; num++) {
-        if (isValid(task, row, col, num)) {
+        if (isValid(tas, row, col, num)) {
             vector<int> newTask = task;
             newTask[row * 9 + col] = num;
             tasks.push(newTask);
