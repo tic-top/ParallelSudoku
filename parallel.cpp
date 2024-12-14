@@ -243,12 +243,7 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        // Write the new header to the output file
-        // Assuming input header has at least 5 fields: puzzle,solution,clues,difficulty,difficulty_range
-        if (!headerLine.empty() && headerLine.back() == '\n') {
-            headerLine.pop_back();  // 去除换行符
-        }
-        outputFile << headerLine << ",result,time\n";
+        outputFile << "puzzle,solution,clues,difficulty,difficulty_range,result,time\n";
 
         string line;
         // Process each puzzle in the input CSV
