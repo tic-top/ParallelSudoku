@@ -184,16 +184,17 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
         }
         else if (tag == TAG_SOLUTION_FAIL)
         {
-            cout << "Recv Failure"<< endl;
             MPI_Recv(NULL, 1, MPI_INT, source, TAG_SOLUTION_FAIL, MPI_COMM_WORLD, &status);
             // Continue assigning tasks if available
             if (!tasks.empty())
             {
+                cout << "Recv Failure and give a task"<< endl;
                 vector<int> task = tasks.front();
                 tasks.pop();
                 MPI_Send(&task[0], 81, MPI_INT, source, TAG_SEND_TASK, MPI_COMM_WORLD);
             }else{
                 workingservents--;
+                cout << "Recv Failure remain server: " << workingservents<< endl;
             }
         }
     }
