@@ -69,10 +69,42 @@ bool solveSudokuDFS(int M[81]) {
     return false; // Trigger backtracking
 }
 
+int expandtasks(vector<int> &task, qeque<vector<int>> &tasks) {
+    int row, col;
+    if (!findEmpty(task, row, col)) {
+        return 0; // 0 solved
+    }
+    int expanded = 0;
+    for (int num = 1; num <= 9; num++) {
+        if (isValid(task, row, col, num)) {
+            vector<int> newTask = task;
+            newTask[row * 9 + col] = num;
+            tasks.push(newTask);
+            expanded++;
+        }
+    }
+    return (expanded > 0); // no reasonable solution
+}
+
 // Function to distribute tasks to workers
 void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ostream &outputFile, bool &terminateAll) {
     int activeWorkers = p;
     terminateAll = false;
+    // if tasks.size() < p, expand the tasks one round
+    // if return 2, then expand the tasks again
+    while ((int)tasks.size() < p){
+        vector<int> task = tasks.front(); tasks.pop();
+        int flag = expandtasks(task, tasks);
+        if (flag == 0) {
+            // we have get the solution, task is the solution
+            double end = MPI_Wtime();
+            for (int i = 0; i < 81; i++) {
+                    outputFile << task[i];
+                }
+            outputFile << ',' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
+            return;
+        } 
+    }
 
     while (activeWorkers > 0 && !terminateAll) {
         MPI_Status status;

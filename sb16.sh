@@ -14,7 +14,11 @@
 p=16
 module load gcc
 module load openmpi
-mpic++ -O3 parallel.cpp -o main
+# if main not exist then continue else compile
+if [ ! -f main ]; then
+    mpic++ -O3 parallel.cpp -o main
+fi
+
 export UCX_LOG_LEVEL=error
 
 input_csv="sudoku.csv"
