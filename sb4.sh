@@ -14,10 +14,8 @@
 p=4
 module load gcc
 module load openmpi
-if [ ! -f main ]; then
-    mpic++ -O3 parallel.cpp -o main
-fi
-export UCX_LOG_LEVEL=error
+mpic++ -O3 parallel.cpp -o main
+# export UCX_LOG_LEVEL=error
 
 input_csv="sudoku.csv"
 output_csv="output$p.csv"
