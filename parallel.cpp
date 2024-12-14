@@ -99,7 +99,7 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
                 for (int i = 0; i < 81; i++) {
                     outputFile << solutionBoard[i];
                 }
-                outputFile << ' ' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
+                outputFile << ',' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
                 // Notify all workers to terminate
                 for (int w = 1; w <= p; w++) {
                     if (w != source) {
@@ -205,6 +205,9 @@ int main(int argc, char* argv[]) {
 
         // Write the new header to the output file
         // Assuming input header has at least 5 fields: puzzle,solution,clues,difficulty,difficulty_range
+        if (!headerLine.empty() && headerLine.back() == '\n') {
+            headerLine.pop_back();  // 去除换行符
+        }
         outputFile << headerLine << ",result,time\n";
 
         string line;
@@ -250,6 +253,8 @@ int main(int argc, char* argv[]) {
             string clues = fields[2];
             string difficulty = fields[3];
             string difficulty_range = fields[4];
+            // 把这几个先输出
+            outputFile << puzzle << "," << solution << "," << clues << "," << difficulty << "," << difficulty_range << ",";
 
             // Validate puzzle length
             if (puzzle.length() != 81) {
