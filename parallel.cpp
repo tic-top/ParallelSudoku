@@ -70,9 +70,17 @@ bool solveSudokuDFS(int M[81]) {
 }
 
 int expandtasks(vector<int> &task, queue<vector<int>> &tasks) {
-    int row, col;
-    if (!findEmpty(task, row, col)) {
-        return 0; // 0 solved
+    int row=-1, col=-1;
+    for (int i = 0; i < 81; i++) {
+        if (task[i] == 0) {
+            row = i / 9;
+            col = i % 9;
+            break;
+        }
+    }
+    if (row==-1 && col==-1) {
+        // No empty cell found, puzzle solved
+        return 0;
     }
     int expanded = 0;
     for (int num = 1; num <= 9; num++) {
