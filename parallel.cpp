@@ -142,6 +142,7 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
 
     // 第一批的题目发放
     MPI_Status status;
+    int workingservents = 0;
     for (int w = 1; w <= p; w++)
     {
         if (!tasks.empty())
@@ -149,11 +150,12 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             vector<int> task = tasks.front();
             tasks.pop();
             MPI_Send(&task[0], 81, MPI_INT, w, TAG_SEND_TASK, MPI_COMM_WORLD);
+            workingservents++;
         }
     }
 
     // 确保有解
-    while (!solved)
+    while (workingservents>0)
     {
         MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         int source = status.MPI_SOURCE;
@@ -182,6 +184,8 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
                 vector<int> task = tasks.front();
                 tasks.pop();
                 MPI_Send(&task[0], 81, MPI_INT, source, TAG_SEND_TASK, MPI_COMM_WORLD);
+            }else{
+                workingservents--;
             }
         }
     }
