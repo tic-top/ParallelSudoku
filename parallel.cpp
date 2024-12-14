@@ -173,7 +173,8 @@ void distributeTasks(queue<vector<int>> &tasks, int p, double taskStartTime, ost
             }
             outputFile << ',' << fixed << setprecision(3) << (end - taskStartTime) * 1000 << endl;
             solved=true;
-            break;
+            // clear the tasks
+            tasks = queue<vector<int>>();
         }
         else if (tag == TAG_SOLUTION_FAIL)
         {
